@@ -1,0 +1,49 @@
+version: '3.8'
+
+services:
+  # Base de Datos (PostgreSQL)
+  postgres_db:
+    image: postgres:15
+    container_name: taskmaster_db
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: joaquin
+      POSTGRES_DB: mi_primer_nest
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data # Persistencia de datos
+
+  # Backend (NestJS)
+  api:
+    build: ./mi-primer-nest
+    container_name: taskmaster_api
+    ports:
+      - "3000:3000"
+    environment:
+      DATABASE_URL: "postgresql://postgres:joaquin@postgres_db:5432/mi_primer_nest?schema=public"
+      JWT_SECRET: "tu_clave_super_segura"
+    depends_on:
+      - postgres_db # No arranca hasta que la DB esté lista
+    volumes:
+    - ./mi-primer-nest:/usr/src/app           # Mapeo exacto al WORKDIR del Dockerfile
+    - /usr/src/app/node_modules
+
+  # Frontend (React)
+  client:
+    build: ./tasks-frontend
+    container_name: taskmaster_client
+    ports:
+      - "5173:5173"
+    environment:
+      VITE_API_URL: http://localhost:3000/api/v1/
+    depends_on:
+      - api
+    volumes:
+      - ./tasks-frontend:/usr/src/app
+      - /usr/src/app/node_modules
+    
+
+volumes:
+  postgres_data: # Define el volumen para que la DB no se borre al apagar Docker
