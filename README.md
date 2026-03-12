@@ -17,18 +17,26 @@ La forma más rápida de ver el sistema en acción es utilizando Docker. No nece
 
 Clonar el repositorio:
 
-Bash
+Bash:
+
 git clone https://github.com/tu-usuario/taskmaster-pro.git
 cd taskmaster-pro
 Levantar el sistema completo:
 
-Bash
+Bash:
+
 docker-compose up --build
+
 Acceso:
 
-Frontend: http://localhost:5173
+Frontend:
 
-Backend API: http://localhost:3000
+ http://localhost:5173
+
+
+Backend API: 
+
+http://localhost:3000
 
 🛠️ Highlights de Ingeniería
 1. Auditoría de Performance (Frontend)
@@ -47,14 +55,18 @@ Unit Tests: Validación de lógica de negocio en servicios.
 
 Functional Tests: Pruebas de endpoints con Supertest, verificando el flujo de guards, pipes y respuesta de la API.
 
-Ejecución: cd mi-primer-nest && npm run test
+Ejecución: 
+
+cd mi-primer-nest && npm run test
 
 Frontend (Vitest + RTL)
 Component Testing: Pruebas de interacción con React Testing Library.
 
 Context Testing: Verificación de persistencia de sesión en el AuthContext.
 
-Ejecución: cd tasks-frontend && npm test
+Ejecución: 
+
+cd tasks-frontend && npm test
 
 📂 Estructura del Proyecto
 Plaintext
