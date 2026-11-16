@@ -16,9 +16,11 @@ Necesitás Git y Docker con Compose v2 o posterior. Los puertos locales 5173, 30
 ```bash
 git clone https://github.com/joaquinalder/TasksManager.git
 cd TasksManager
-docker compose up -d postgres_db
-docker compose exec postgres_db pg_isready -h localhost -U postgres
+openssl rand -hex 32 | sed 's/^/JWT_SECRET=/' > .env
+docker compose up -d --wait postgres_db
 ```
+
+En PowerShell, creá el archivo de configuración con `"JWT_SECRET=$([guid]::NewGuid().ToString('N'))$([guid]::NewGuid().ToString('N'))" | Set-Content .env` en lugar de la línea con OpenSSL.
 
 Cuando PostgreSQL indique que acepta conexiones, aplicá las migraciones y levantá la aplicación.
 
@@ -33,22 +35,28 @@ docker compose up --build
 | Documentación de la API | [localhost:3000/docs](http://localhost:3000/docs) |
 | Base de la API | `http://localhost:3000/api/v1` |
 
-Registrá un usuario de prueba desde la interfaz. Para probar rutas protegidas en Swagger, iniciá sesión y usá el JWT con **Authorize**. Las credenciales y el secreto del Compose son valores para desarrollo local.
+Registrá un usuario de prueba desde la interfaz. Para probar rutas protegidas en Swagger, iniciá sesión y usá el JWT con **Authorize**. Las credenciales de PostgreSQL del Compose son para desarrollo local.
 
 Para detener el entorno, ejecutá `docker compose down`. Los datos de PostgreSQL quedan en el volumen local.
 
 ## Cómo está organizado
 
 - [tasks-frontend/](tasks-frontend/) contiene la interfaz SPA construida con React 19, Vite y Tailwind CSS.
-- [mi-primer-nest/](mi-primer-nest/) contiene la API, con módulos de autenticación, tareas y proyectos, validación de DTOs y migraciones de Prisma.
+- [tasks-api/](tasks-api/) contiene la API, con módulos de autenticación, tareas y proyectos, validación de DTOs y migraciones de Prisma.
 - [docker-compose.yml](docker-compose.yml) define el cliente, la API y PostgreSQL para desarrollo.
+
+## Proyectos y tareas
+
+Cada usuario accede a sus propios proyectos y tareas. Al eliminar un proyecto, sus tareas quedan disponibles en «Sin proyecto». En la API, omitir `projectId` al editar una tarea conserva el proyecto. Enviar `projectId: null` la desvincula.
+
+La migración de propiedad conserva los registros anteriores. Las tareas vinculadas a un proyecto con dueño heredan ese dueño. Los registros sin dueño conocido quedan fuera de las cuentas hasta que un administrador los vincule a la cuenta correcta.
 
 ## Pruebas
 
-Con Node.js 20.19 o posterior, podés ejecutar las suites existentes desde sus respectivas carpetas.
+Con Node.js 22.12 o posterior, podés ejecutar las suites existentes desde sus respectivas carpetas.
 
 ```bash
-# Desde mi-primer-nest/
+# Desde tasks-api/
 npm ci
 npx prisma generate
 npm test -- --runInBand
@@ -57,3 +65,5 @@ npm test -- --runInBand
 npm ci
 npm test -- --run
 ```
+
+La suite de integración usa un PostgreSQL de pruebas configurado mediante `DATABASE_URL` y un `JWT_SECRET` de al menos 32 bytes. Aplicá las migraciones con `npx prisma migrate deploy` y ejecutá `npm run test:e2e -- --runInBand` desde `tasks-api/`. Ejecutá esta suite contra una base de pruebas vacía y dedicada.

@@ -21,7 +21,7 @@ export const EditTaskModal = ({ task, projects, onClose, onSave }: EditTaskModal
     title: task.title,
     description: task.description || '',
     completed: task.completed,
-    projectId: task.project?.id
+    projectId: task.project?.id ?? null
   });
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -77,15 +77,16 @@ export const EditTaskModal = ({ task, projects, onClose, onSave }: EditTaskModal
 
           <div className="flex items-center gap-3 p-3 bg-slate-900/50 rounded-lg border border-slate-700/50">
             <select 
+              aria-label="Proyecto"
               className="bg-slate-900 border border-slate-700 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-blue-500 transition-colors w-full"
               // 1. Vinculamos el valor al estado (si es null, usamos string vacío)
-              value={formData.projectId || ''} 
+              value={formData.projectId ?? ''}
               // 2. Actualizamos el estado al cambiar
               onChange={(e) => {
                 const val = e.target.value;
                 setFormData({ 
                   ...formData, 
-                  projectId: val === "" ? undefined : Number(val) 
+                  projectId: val === "" ? null : Number(val)
                 });
               }}
             >

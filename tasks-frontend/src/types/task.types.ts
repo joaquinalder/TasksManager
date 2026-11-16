@@ -6,7 +6,7 @@ export interface Task {
   completed: boolean;
   createdAt: string;
   updatedAt: string;
-  projectId?: number | undefined;
+  projectId?: number | null;
   project?: {
     id: number;
     name: string;
