@@ -1,80 +1,59 @@
-🚀 TaskMaster Pro 2026 - Full Stack Engineering Project
-Bienvenido a TaskMaster Pro, una plataforma integral de gestión de tareas diseñada bajo los más altos estándares de Systems Design y Data Management. Este proyecto no solo resuelve una necesidad funcional, sino que sirve como caso de estudio para la optimización de recursos y robustez arquitectónica.
+# TasksManager
 
-🏗️ Arquitectura del Sistema
-El sistema está diseñado como una arquitectura desacoplada de alto rendimiento:
+Aplicación web para organizar tareas y proyectos. El frontend en **React y TypeScript** consume una API REST en **NestJS**. La API persiste datos en **PostgreSQL** mediante **Prisma**.
 
-Frontend: Single Page Application (SPA) con React 18 + Vite, optimizada para minimizar el uso de CPU y evitar fugas de memoria.
+## Qué podés probar
 
-Backend: API REST con NestJS, siguiendo patrones de inyección de dependencias y validación estricta de datos.
+- Crear una cuenta e iniciar sesión con JWT.
+- Crear proyectos y asociarles tareas.
+- Crear, editar y eliminar tareas desde la interfaz.
+- Explorar la API y sus esquemas en Swagger.
 
-Infraestructura: Orquestación mediante Docker & Docker Compose para un despliegue reproducible en cualquier entorno.
+## Ejecutar en local
 
-Base de Datos: PostgreSQL con persistencia gestionada mediante Prisma ORM.
+Necesitás Git y Docker con Compose v2 o posterior. Los puertos locales 5173, 3000 y 5433 deben estar libres.
 
-⚡ Quick Start (Modo Evaluador)
-La forma más rápida de ver el sistema en acción es utilizando Docker. No necesitás instalar Node.js ni bases de datos localmente.
+```bash
+git clone https://github.com/joaquinalder/TasksManager.git
+cd TasksManager
+docker compose up -d postgres_db
+docker compose exec postgres_db pg_isready -h localhost -U postgres
+```
 
-Clonar el repositorio:
+Cuando PostgreSQL indique que acepta conexiones, aplicá las migraciones y levantá la aplicación.
 
-Bash:
+```bash
+docker compose run --rm --build api npx prisma migrate deploy
+docker compose up --build
+```
 
-git clone https://github.com/tu-usuario/taskmaster-pro.git
-cd taskmaster-pro
-Levantar el sistema completo:
+| Servicio | Dirección |
+| --- | --- |
+| Frontend | [localhost:5173](http://localhost:5173) |
+| Documentación de la API | [localhost:3000/docs](http://localhost:3000/docs) |
+| Base de la API | `http://localhost:3000/api/v1` |
 
-Bash:
+Registrá un usuario de prueba desde la interfaz. Para probar rutas protegidas en Swagger, iniciá sesión y usá el JWT con **Authorize**. Las credenciales y el secreto del Compose son valores para desarrollo local.
 
-docker-compose up --build
+Para detener el entorno, ejecutá `docker compose down`. Los datos de PostgreSQL quedan en el volumen local.
 
-Acceso:
+## Cómo está organizado
 
-Frontend:
+- [tasks-frontend/](tasks-frontend/) contiene la interfaz SPA construida con React 19, Vite y Tailwind CSS.
+- [mi-primer-nest/](mi-primer-nest/) contiene la API, con módulos de autenticación, tareas y proyectos, validación de DTOs y migraciones de Prisma.
+- [docker-compose.yml](docker-compose.yml) define el cliente, la API y PostgreSQL para desarrollo.
 
- http://localhost:5173
+## Pruebas
 
+Con Node.js 20.19 o posterior, podés ejecutar las suites existentes desde sus respectivas carpetas.
 
-Backend API: 
+```bash
+# Desde mi-primer-nest/
+npm ci
+npx prisma generate
+npm test -- --runInBand
 
-http://localhost:3000
-
-🛠️ Highlights de Ingeniería
-1. Auditoría de Performance (Frontend)
-A diferencia de aplicaciones estándar, TaskMaster Pro fue sometido a un análisis de perfiles de memoria (Heap Snapshots).
-
-2. Integridad de Datos (Backend)
-Validación Atómica: Uso de ValidationPipe y DTOs con class-validator para asegurar que el sistema rechace datos inconsistentes antes de procesar cualquier lógica.
-
-Relaciones Relacionales: Estructura de datos optimizada en PostgreSQL para manejar tareas vinculadas a usuarios y proyectos con integridad referencial total.
-
-🧪 Suite de Testing
-El proyecto cuenta con una cobertura integral en ambos frentes:
-
-Backend (Vitest/Jest)
-Unit Tests: Validación de lógica de negocio en servicios.
-
-Functional Tests: Pruebas de endpoints con Supertest, verificando el flujo de guards, pipes y respuesta de la API.
-
-Ejecución: 
-
-cd mi-primer-nest && npm run test
-
-Frontend (Vitest + RTL)
-Component Testing: Pruebas de interacción con React Testing Library.
-
-Context Testing: Verificación de persistencia de sesión en el AuthContext.
-
-Ejecución: 
-
-cd tasks-frontend && npm test
-
-📂 Estructura del Proyecto
-Plaintext
-/taskmaster-pro
-├── /mi-primer-nest    # Backend API (NestJS)
-├── /tasks-frontend    # Cliente Web (React)
-├── docker-compose.yml # Orquestador de servicios
-└── README.md          # Guía principal
-
-
-Desarrollado por: Joaquín - Full Stack Developer 2026
+# Desde tasks-frontend/
+npm ci
+npm test -- --run
+```
